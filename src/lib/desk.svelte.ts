@@ -1,4 +1,10 @@
-import { ALERT_COOLDOWN_MS, DEFAULT_ASSETS, DEFAULT_IDS, POLL_MS } from "./assets";
+import {
+  ALERT_COOLDOWN_MS,
+  DEFAULT_ASSETS,
+  DEFAULT_IDS,
+  PINNED_IDS,
+  POLL_MS,
+} from "./assets";
 import { formatPct, formatPrice } from "./format";
 import { fetchAllQuotes } from "./quotes";
 import { appendQuoteTick, loadDesk, mergeTicks, saveDesk, uid } from "./storage";
@@ -195,6 +201,7 @@ class Desk {
   }
 
   removeAsset(id: string) {
+    if (PINNED_IDS.has(id)) return;
     if (this.assets.length <= 1) return;
     const remaining = this.assets.filter((a) => a.id !== id);
     if (DEFAULT_IDS.has(id)) {

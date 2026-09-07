@@ -129,7 +129,7 @@
       class="grid flex-1 items-start gap-4 p-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(380px,0.9fr)]"
     >
       <section
-        class="grid grid-cols-1 content-start gap-3 sm:grid-cols-2 xl:grid-cols-3"
+        class="grid grid-cols-1 content-start gap-3 sm:grid-cols-2 lg:grid-cols-3"
       >
         {#each desk.assets as asset (asset.id)}
           <AssetCard
@@ -141,7 +141,7 @@
             dragging={draggingId === asset.id}
             over={overId === asset.id && draggingId !== asset.id}
             onFocus={() => desk.setFocus(asset.id)}
-            onRemove={desk.assets.length > 1
+            onRemove={desk.assets.length > 1 && asset.id !== "spx"
               ? () => desk.removeAsset(asset.id)
               : undefined}
             onDragStart={(e) => dragStart(e, asset.id)}
@@ -161,7 +161,9 @@
         rules={desk.rules}
         onAddRule={(kind, value) => desk.addRule(focus.id, kind, value)}
         onRemoveRule={(id) => desk.removeRule(id)}
-        onDrop={desk.assets.length > 1 ? () => desk.removeAsset(focus.id) : undefined}
+        onDrop={desk.assets.length > 1 && focus.id !== "spx"
+          ? () => desk.removeAsset(focus.id)
+          : undefined}
       />
     </main>
 

@@ -1,4 +1,4 @@
-import { DEFAULT_ASSETS } from "./assets";
+import { DEFAULT_ASSETS, PINNED_IDS } from "./assets";
 import type { Asset } from "./types";
 
 function spxLike(asset: Asset): boolean {
@@ -48,7 +48,7 @@ export function composeWatchlist(
   hiddenIds: string[],
   order: string[] = [],
 ): Asset[] {
-  const hidden = new Set(hiddenIds);
+  const hidden = new Set([...hiddenIds].filter((id) => !PINNED_IDS.has(id)));
   const defaults = DEFAULT_ASSETS.filter((a) => !hidden.has(a.id));
   const extras = custom.filter((row) => !defaults.some((d) => sameAsset(d, row)));
   const list = [...defaults, ...extras];

@@ -49,7 +49,7 @@ export function saveDesk(state: DeskState) {
 }
 
 function promoteSpx(order: string[]): string[] {
-  if (!order.includes("spx")) return order;
+  if (!order.length) return order;
   const next = order.filter((id) => id !== "spx");
   const btc = next.indexOf("btc");
   next.splice(btc >= 0 ? btc + 1 : 0, 0, "spx");

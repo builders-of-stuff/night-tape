@@ -141,6 +141,7 @@ export const DEFAULT_ASSETS: Asset[] = [
 ];
 
 export const DEFAULT_IDS = new Set(DEFAULT_ASSETS.map((a) => a.id));
+export const PINNED_IDS = new Set(["spx"]);
 
 export const POLL_MS = 20_000;
 export const TICK_CAP = 1500;
