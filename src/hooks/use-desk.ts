@@ -1,8 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ALERT_COOLDOWN_MS, ASSET_BY_ID, POLL_MS } from "../lib/assets";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ALERT_COOLDOWN_MS, DEFAULT_ASSETS, DEFAULT_IDS, POLL_MS } from "../lib/assets";
 import { formatPct, formatPrice } from "../lib/format";
 import { appendQuoteTick, loadDesk, mergeTicks, saveDesk, uid } from "../lib/storage";
-import type { AlertEvent, AlertKind, AlertRule, Quote, Tick } from "../lib/types";
+import type {
+  AlertEvent,
+  AlertKind,
+  AlertRule,
+  Asset,
+  Quote,
+  Tick,
+} from "../lib/types";
+import { composeWatchlist, findOnDesk, sameAsset } from "../lib/watchlist";
 import { fetchAllQuotes } from "../services/quotes";
 
 const initial = loadDesk();
@@ -10,13 +18,14 @@ const initial = loadDesk();
 function evaluate(
   quote: Quote,
   rules: AlertRule[],
+  assets: Asset[],
 ): { rules: AlertRule[]; events: AlertEvent[] } {
   const now = Date.now();
   const events: AlertEvent[] = [];
   const next = rules.map((rule) => {
     if (!rule.enabled || rule.assetId !== quote.id) return rule;
     if (rule.lastFiredAt && now - rule.lastFiredAt < ALERT_COOLDOWN_MS) return rule;
-    const asset = ASSET_BY_ID[quote.id];
+    const asset = assets.find((a) => a.id === quote.id);
     const symbol = asset?.symbol ?? quote.id.toUpperCase();
     let tripped = false;
     let message = "";
@@ -60,6 +69,8 @@ export function useDesk() {
   const [rules, setRules] = useState<AlertRule[]>(initial.rules);
   const [events, setEvents] = useState<AlertEvent[]>(initial.events);
   const [focusId, setFocusId] = useState(initial.focusId);
+  const [customAssets, setCustomAssets] = useState<Asset[]>(initial.customAssets);
+  const [hiddenIds, setHiddenIds] = useState<string[]>(initial.hiddenIds);
   const [status, setStatus] = useState<"live" | "error" | "idle">("idle");
   const [errors, setErrors] = useState<string[]>([]);
   const [updatedAt, setUpdatedAt] = useState<number | null>(
@@ -70,16 +81,15 @@ export function useDesk() {
   rulesRef.current = rules;
   const seededRef = useRef(false);
 
-  const poll = useCallback(async () => {
-    try {
-      const seed = !seededRef.current;
-      const batch = await fetchAllQuotes(seed);
-      if (seed && batch.quotes.length) seededRef.current = true;
-      if (!batch.quotes.length) {
-        setStatus("error");
-        setErrors(batch.errors.length ? batch.errors : ["No quotes returned"]);
-        return;
-      }
+  const assets = useMemo(
+    () => composeWatchlist(customAssets, hiddenIds),
+    [customAssets, hiddenIds],
+  );
+  const assetsRef = useRef(assets);
+  assetsRef.current = assets;
+
+  const applyBatch = useCallback(
+    (batch: Awaited<ReturnType<typeof fetchAllQuotes>>) => {
       const flash: Record<string, number> = {};
       setQuotes((prev) => {
         const next = { ...prev };
@@ -104,7 +114,7 @@ export function useDesk() {
       let nextRules = rulesRef.current;
       const fired: AlertEvent[] = [];
       for (const quote of batch.quotes) {
-        const result = evaluate(quote, nextRules);
+        const result = evaluate(quote, nextRules, assetsRef.current);
         nextRules = result.rules;
         fired.push(...result.events);
       }
@@ -114,6 +124,21 @@ export function useDesk() {
         setEvents((prev) => [...fired, ...prev].slice(0, 80));
         fired.forEach(notifyBrowser);
       }
+    },
+    [],
+  );
+
+  const poll = useCallback(async () => {
+    try {
+      const seed = !seededRef.current;
+      const batch = await fetchAllQuotes(assetsRef.current, seed);
+      if (seed && batch.quotes.length) seededRef.current = true;
+      if (!batch.quotes.length) {
+        setStatus("error");
+        setErrors(batch.errors.length ? batch.errors : ["No quotes returned"]);
+        return;
+      }
+      applyBatch(batch);
       setUpdatedAt(Date.now());
       setErrors(batch.errors);
       setStatus("live");
@@ -121,7 +146,7 @@ export function useDesk() {
       setStatus("error");
       setErrors([err instanceof Error ? err.message : "Poll failed"]);
     }
-  }, []);
+  }, [applyBatch]);
 
   useEffect(() => {
     void poll();
@@ -130,8 +155,62 @@ export function useDesk() {
   }, [poll]);
 
   useEffect(() => {
-    saveDesk({ quotes, ticks, rules, events, focusId });
-  }, [quotes, ticks, rules, events, focusId]);
+    saveDesk({
+      quotes,
+      ticks,
+      rules,
+      events,
+      focusId,
+      customAssets,
+      hiddenIds,
+    });
+  }, [quotes, ticks, rules, events, focusId, customAssets, hiddenIds]);
+
+  const addAsset = useCallback(
+    async (incoming: Asset) => {
+      const existing = findOnDesk(incoming, assetsRef.current);
+      if (existing) {
+        setFocusId(existing.id);
+        return existing.id;
+      }
+      const defaultMatch = DEFAULT_ASSETS.find((d) => sameAsset(d, incoming));
+      if (defaultMatch) {
+        setHiddenIds((prev) => prev.filter((id) => id !== defaultMatch.id));
+        setFocusId(defaultMatch.id);
+        return defaultMatch.id;
+      }
+      setCustomAssets((prev) => [...prev, incoming]);
+      setFocusId(incoming.id);
+      try {
+        const batch = await fetchAllQuotes([incoming], true);
+        applyBatch(batch);
+        if (batch.quotes.length) setUpdatedAt(Date.now());
+      } catch {
+        // Next poll will retry.
+      }
+      return incoming.id;
+    },
+    [applyBatch],
+  );
+
+  const removeAsset = useCallback((id: string) => {
+    const current = assetsRef.current;
+    if (current.length <= 1) return;
+    if (DEFAULT_IDS.has(id)) {
+      setHiddenIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    } else {
+      setCustomAssets((prev) => prev.filter((a) => a.id !== id));
+    }
+    setFocusId((prev) => {
+      if (prev !== id) return prev;
+      return current.find((a) => a.id !== id)?.id ?? prev;
+    });
+    setRules((prev) => {
+      const next = prev.filter((r) => r.assetId !== id);
+      rulesRef.current = next;
+      return next;
+    });
+  }, []);
 
   const addRule = useCallback((assetId: string, kind: AlertKind, value: number) => {
     if (!Number.isFinite(value) || value <= 0) return;
@@ -153,6 +232,7 @@ export function useDesk() {
   const clearEvents = useCallback(() => setEvents([]), []);
 
   return {
+    assets,
     quotes,
     ticks,
     rules,
@@ -163,6 +243,8 @@ export function useDesk() {
     errors,
     updatedAt,
     flashed,
+    addAsset,
+    removeAsset,
     addRule,
     removeRule,
     clearEvents,

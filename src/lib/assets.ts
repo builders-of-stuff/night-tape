@@ -1,9 +1,9 @@
 import type { Asset } from "./types";
 
-const tv = (symbol: string) =>
+export const tv = (symbol: string) =>
   `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(symbol)}`;
 
-export const ASSETS: Asset[] = [
+export const DEFAULT_ASSETS: Asset[] = [
   {
     id: "btc",
     symbol: "BTC",
@@ -138,10 +138,7 @@ export const ASSETS: Asset[] = [
   },
 ];
 
-export const ASSET_BY_ID = Object.fromEntries(ASSETS.map((a) => [a.id, a])) as Record<
-  string,
-  Asset
->;
+export const DEFAULT_IDS = new Set(DEFAULT_ASSETS.map((a) => a.id));
 
 export const POLL_MS = 20_000;
 export const TICK_CAP = 1500;

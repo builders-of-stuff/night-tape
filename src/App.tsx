@@ -1,19 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { AssetCard } from "./components/asset-card";
 import { FocusPane } from "./components/focus-pane";
+import { SearchBar } from "./components/search-bar";
 import { TickerTape } from "./components/ticker-tape";
 import { useDesk } from "./hooks/use-desk";
-import { ASSETS, ASSET_BY_ID, POLL_MS } from "./lib/assets";
+import { POLL_MS } from "./lib/assets";
 import { formatClock, formatTime, usSession } from "./lib/format";
 
 export default function App() {
   const desk = useDesk();
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   const [notify, setNotify] = useState(
     typeof Notification === "undefined" ? "unsupported" : Notification.permission,
   );
   const [logOpen, setLogOpen] = useState(false);
-  const focus = ASSET_BY_ID[desk.focusId] ?? ASSETS[0];
+  const focus = desk.assets.find((a) => a.id === desk.focusId) ?? desk.assets[0];
   const session = usSession(now);
   const toasts = useMemo(
     () => desk.events.filter((e) => now - e.at < 10_000).slice(0, 3),
@@ -30,6 +31,8 @@ export default function App() {
     const perm = await Notification.requestPermission();
     setNotify(perm);
   }
+
+  if (!focus) return null;
 
   return (
     <div className="flex min-h-svh flex-col bg-ink text-paper">
@@ -72,7 +75,18 @@ export default function App() {
         </div>
       </header>
 
-      <TickerTape quotes={desk.quotes} flashed={desk.flashed} now={now} />
+      <SearchBar
+        assets={desk.assets}
+        onAdd={(asset) => void desk.addAsset(asset)}
+        onFocus={desk.setFocusId}
+      />
+
+      <TickerTape
+        assets={desk.assets}
+        quotes={desk.quotes}
+        flashed={desk.flashed}
+        now={now}
+      />
 
       {desk.errors.length > 0 && (
         <div className="border-b border-rule px-5 py-1.5 font-mono text-[11px] text-stamp">
@@ -82,7 +96,7 @@ export default function App() {
 
       <main className="grid min-h-0 flex-1 gap-4 p-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(380px,0.9fr)]">
         <section className="grid min-h-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {ASSETS.map((asset) => (
+          {desk.assets.map((asset) => (
             <AssetCard
               key={asset.id}
               asset={asset}
@@ -91,6 +105,9 @@ export default function App() {
               active={focus.id === asset.id}
               fresh={now - (desk.flashed[asset.id] ?? 0) < 2800}
               onFocus={() => desk.setFocusId(asset.id)}
+              onRemove={
+                desk.assets.length > 1 ? () => desk.removeAsset(asset.id) : undefined
+              }
             />
           ))}
         </section>
@@ -101,6 +118,7 @@ export default function App() {
           rules={desk.rules}
           onAddRule={(kind, value) => desk.addRule(focus.id, kind, value)}
           onRemoveRule={desk.removeRule}
+          onDrop={desk.assets.length > 1 ? () => desk.removeAsset(focus.id) : undefined}
         />
       </main>
 

@@ -43,4 +43,12 @@ Arm a tripwire on the focused name: price above, price below, or session move �
 
 ## Add a name
 
-Edit `src/lib/assets.ts`. Crypto needs a CoinGecko id, a meme needs a token mint, a stock needs a CNBC symbol. Restart `pnpm run dev`.
+Use the **add** search on the desk (`/` to focus). It hunts CoinGecko, DexScreener, and Yahoo at once:
+
+- Coins → CoinGecko + TradingView
+- Memes / mint addresses → DexScreener
+- Tickers (NVDA, SPY, `BRK-B`) → CNBC quotes + TradingView
+
+Hits land on the blotter and persist in `localStorage`. Drop a bay with **×** or **Drop from desk**. The starter names (BTC, ZEC, SOL, SUI, ETH, ZCAT, TSLA, SPCX, SPX) can be dropped and searched back.
+
+The starter list still lives in `src/lib/assets.ts` if you want to change the default book.

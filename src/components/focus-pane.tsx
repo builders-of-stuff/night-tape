@@ -11,6 +11,7 @@ type Props = {
   rules: AlertRule[];
   onAddRule: (kind: AlertKind, value: number) => void;
   onRemoveRule: (id: string) => void;
+  onDrop?: () => void;
 };
 
 export function FocusPane({
@@ -20,6 +21,7 @@ export function FocusPane({
   rules,
   onAddRule,
   onRemoveRule,
+  onDrop,
 }: Props) {
   const [tab, setTab] = useState<"full" | "tape">("full");
   const [range, setRange] = useState<Range>("1D");
@@ -100,7 +102,7 @@ export function FocusPane({
         )}
       </div>
 
-      <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-rule px-4 py-2 font-mono text-[11px]">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-rule px-4 py-2 font-mono text-[11px]">
         {links.map((link) => (
           <a
             key={link.href}
@@ -112,6 +114,15 @@ export function FocusPane({
             {link.label} ↗
           </a>
         ))}
+        {onDrop && (
+          <button
+            type="button"
+            onClick={onDrop}
+            className="ml-auto text-ghost hover:text-stamp"
+          >
+            Drop from desk
+          </button>
+        )}
       </div>
 
       <AlertForm

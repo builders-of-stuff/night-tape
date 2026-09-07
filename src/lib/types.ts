@@ -73,4 +73,6 @@ export type DeskState = {
   rules: AlertRule[];
   events: AlertEvent[];
   focusId: string;
+  customAssets: Asset[];
+  hiddenIds: string[];
 };

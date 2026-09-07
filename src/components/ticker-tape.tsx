@@ -1,8 +1,8 @@
-import { ASSETS } from "../lib/assets";
 import { cx, formatPct, formatPrice } from "../lib/format";
-import type { Quote } from "../lib/types";
+import type { Asset, Quote } from "../lib/types";
 
 type Props = {
+  assets: Asset[];
   quotes: Record<string, Quote>;
   flashed: Record<string, number>;
   now: number;
@@ -31,9 +31,9 @@ function Print({
   );
 }
 
-export function TickerTape({ quotes, flashed, now }: Props) {
+export function TickerTape({ assets, quotes, flashed, now }: Props) {
   const prints = (lane: string) =>
-    ASSETS.map((asset) => (
+    assets.map((asset) => (
       <Print
         key={`${lane}-${asset.id}`}
         symbol={asset.symbol}

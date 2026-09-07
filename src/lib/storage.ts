@@ -1,4 +1,4 @@
-import { ASSETS, STORAGE_KEY, TICK_CAP } from "./assets";
+import { DEFAULT_ASSETS, STORAGE_KEY, TICK_CAP } from "./assets";
 import type { AlertEvent, AlertRule, DeskState, Quote, Tick } from "./types";
 
 const empty = (): DeskState => ({
@@ -6,7 +6,9 @@ const empty = (): DeskState => ({
   ticks: {},
   rules: [],
   events: [],
-  focusId: ASSETS[0]?.id ?? "btc",
+  focusId: DEFAULT_ASSETS[0]?.id ?? "btc",
+  customAssets: [],
+  hiddenIds: [],
 });
 
 export function loadDesk(): DeskState {
@@ -20,6 +22,8 @@ export function loadDesk(): DeskState {
       rules: parsed.rules ?? [],
       events: (parsed.events ?? []).slice(0, 80),
       focusId: parsed.focusId ?? empty().focusId,
+      customAssets: parsed.customAssets ?? [],
+      hiddenIds: parsed.hiddenIds ?? [],
     };
   } catch {
     return empty();

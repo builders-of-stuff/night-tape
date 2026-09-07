@@ -1,4 +1,3 @@
-import { ASSETS } from "../lib/assets";
 import type { Asset, Quote, Tick } from "../lib/types";
 
 export type QuoteBatch = {
@@ -13,7 +12,12 @@ const num = (v: unknown): number | undefined =>
 function money(v: unknown): number | undefined {
   if (typeof v === "number" && Number.isFinite(v)) return v;
   if (typeof v !== "string") return undefined;
-  const n = Number(v.replace(/[%,$,+]/g, "").replace(/,/g, "").trim());
+  const n = Number(
+    v
+      .replace(/[%,$,+]/g, "")
+      .replace(/,/g, "")
+      .trim(),
+  );
   return Number.isFinite(n) ? n : undefined;
 }
 
@@ -111,14 +115,16 @@ type DexPair = {
 };
 
 function pickPair(pairs: DexPair[]): DexPair | undefined {
-  return [...pairs].sort((a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0];
+  return [...pairs].sort(
+    (a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0),
+  )[0];
 }
 
 async function fetchDex(asset: Asset, seed: boolean): Promise<QuoteBatch> {
   if (!asset.tokenAddress) return { quotes: [], seeds: {}, errors: [] };
-  const data = (await getJson(
-    `/api/dex/latest/dex/tokens/${asset.tokenAddress}`,
-  )) as { pairs?: DexPair[] };
+  const data = (await getJson(`/api/dex/latest/dex/tokens/${asset.tokenAddress}`)) as {
+    pairs?: DexPair[];
+  };
   const pair = pickPair(data.pairs ?? []);
   const price = pair?.priceUsd != null ? Number(pair.priceUsd) : undefined;
   if (!pair || price == null || !Number.isFinite(price)) {
@@ -250,10 +256,13 @@ async function fetchYahooSeed(asset: Asset): Promise<Tick[]> {
   return ticks;
 }
 
-export async function fetchAllQuotes(seed = false): Promise<QuoteBatch> {
-  const geckoAssets = ASSETS.filter((a) => a.geckoId);
-  const dexAssets = ASSETS.filter((a) => a.kind === "dex");
-  const equityAssets = ASSETS.filter((a) => a.cnbcSymbol);
+export async function fetchAllQuotes(
+  assets: Asset[],
+  seed = false,
+): Promise<QuoteBatch> {
+  const geckoAssets = assets.filter((a) => a.geckoId);
+  const dexAssets = assets.filter((a) => a.kind === "dex");
+  const equityAssets = assets.filter((a) => a.cnbcSymbol);
   const jobs: Array<Promise<QuoteBatch>> = [
     fetchGecko(geckoAssets, seed),
     ...dexAssets.map((a) => fetchDex(a, seed)),
@@ -277,10 +286,12 @@ export async function fetchAllQuotes(seed = false): Promise<QuoteBatch> {
 
   if (seed) {
     const seeded = await Promise.allSettled(
-      ASSETS.filter((a) => a.yahooSymbol).map(async (asset) => {
-        const ticks = await fetchYahooSeed(asset);
-        return { id: asset.id, ticks };
-      }),
+      assets
+        .filter((a) => a.yahooSymbol)
+        .map(async (asset) => {
+          const ticks = await fetchYahooSeed(asset);
+          return { id: asset.id, ticks };
+        }),
     );
     for (const item of seeded) {
       if (item.status === "fulfilled" && item.value.ticks.length) {
