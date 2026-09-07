@@ -46,7 +46,7 @@
   }
 </script>
 
-<aside class="flex min-h-0 flex-col border border-rule bg-blotter">
+<aside class="flex min-h-0 flex-col border border-rule bg-blotter lg:sticky lg:top-4">
   <header class="border-b border-rule px-4 py-3">
     <div class="flex items-start justify-between gap-3">
       <div>

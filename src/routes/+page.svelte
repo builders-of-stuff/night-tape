@@ -126,9 +126,11 @@
     {/if}
 
     <main
-      class="grid min-h-0 flex-1 gap-4 p-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(380px,0.9fr)]"
+      class="grid flex-1 items-start gap-4 p-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(380px,0.9fr)]"
     >
-      <section class="grid min-h-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <section
+        class="grid grid-cols-1 content-start gap-3 sm:grid-cols-2 xl:grid-cols-3"
+      >
         {#each desk.assets as asset (asset.id)}
           <AssetCard
             {asset}

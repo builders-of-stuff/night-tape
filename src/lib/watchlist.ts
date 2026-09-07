@@ -1,6 +1,28 @@
 import { DEFAULT_ASSETS } from "./assets";
 import type { Asset } from "./types";
 
+function spxLike(asset: Asset): boolean {
+  const blob = [
+    asset.id,
+    asset.symbol,
+    asset.name,
+    asset.cnbcSymbol,
+    asset.yahooSymbol,
+    asset.tradingView,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  return (
+    /\bspx\b/.test(blob) ||
+    blob.includes(".spx") ||
+    blob.includes("^gspc") ||
+    blob.includes("s&p 500") ||
+    blob.includes("s&p500") ||
+    blob.includes("forexcom:spxusd")
+  );
+}
+
 export function sameAsset(a: Asset, b: Asset): boolean {
   if (a.id === b.id) return true;
   if (a.geckoId && a.geckoId === b.geckoId) return true;
@@ -13,6 +35,7 @@ export function sameAsset(a: Asset, b: Asset): boolean {
   }
   if (a.yahooSymbol && a.yahooSymbol === b.yahooSymbol) return true;
   if (a.cnbcSymbol && a.cnbcSymbol === b.cnbcSymbol) return true;
+  if (spxLike(a) && spxLike(b)) return true;
   return false;
 }
 

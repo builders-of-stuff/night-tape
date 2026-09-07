@@ -1,4 +1,4 @@
-import { tv } from "./assets";
+import { DEFAULT_ASSETS, tv } from "./assets";
 import type { Asset } from "./types";
 
 export type SearchGroup = "coin" | "dex" | "stock";
@@ -255,10 +255,28 @@ export function isTickerQuery(query: string): boolean {
   return /^[A-Za-z.]{1,8}$/.test(query.trim());
 }
 
+function defaultSpxHit(query: string): SearchHit[] {
+  const q = query.trim().toLowerCase().replace(/\s+/g, "");
+  if (!/^(s&p|s&p500|spx|sp500|\.spx|\^gspc|gspc)$/.test(q) && !q.includes("s&p")) {
+    return [];
+  }
+  const asset = DEFAULT_ASSETS.find((a) => a.id === "spx");
+  if (!asset) return [];
+  return [
+    {
+      key: asset.id,
+      group: "stock",
+      asset,
+      detail: "index · S&P 500",
+    },
+  ];
+}
+
 export async function searchMarkets(query: string): Promise<SearchHit[]> {
   const q = query.trim();
   if (q.length < 1) return [];
   const jobs = await Promise.allSettled([
+    Promise.resolve(defaultSpxHit(q)),
     confirmTicker(q),
     searchCoins(q),
     searchDex(q),

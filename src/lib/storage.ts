@@ -25,8 +25,8 @@ export function loadDesk(): DeskState {
       events: (parsed.events ?? []).slice(0, 80),
       focusId: parsed.focusId ?? empty().focusId,
       customAssets: parsed.customAssets ?? [],
-      hiddenIds: parsed.hiddenIds ?? [],
-      order: parsed.order ?? [],
+      hiddenIds: (parsed.hiddenIds ?? []).filter((id) => id !== "spx"),
+      order: promoteSpx(parsed.order ?? []),
     };
   } catch {
     return empty();
@@ -46,6 +46,14 @@ export function saveDesk(state: DeskState) {
   } catch {
     // Quota or private mode — the desk still runs in memory.
   }
+}
+
+function promoteSpx(order: string[]): string[] {
+  if (!order.includes("spx")) return order;
+  const next = order.filter((id) => id !== "spx");
+  const btc = next.indexOf("btc");
+  next.splice(btc >= 0 ? btc + 1 : 0, 0, "spx");
+  return next;
 }
 
 export function mergeTicks(existing: Tick[] = [], incoming: Tick[] = []): Tick[] {

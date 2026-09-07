@@ -21,6 +21,21 @@ export const DEFAULT_ASSETS: Asset[] = [
     ],
   },
   {
+    id: "spx",
+    symbol: "S&P",
+    name: "S&P 500",
+    kind: "index",
+    yahooSymbol: "^GSPC",
+    cnbcSymbol: ".SPX",
+    // SP:SPX is gated in the free embed widget.
+    tradingView: "FOREXCOM:SPXUSD",
+    links: [
+      { label: "TradingView", href: tv("FOREXCOM:SPXUSD") },
+      { label: "SPY", href: tv("AMEX:SPY") },
+      { label: "Yahoo", href: "https://finance.yahoo.com/quote/%5EGSPC" },
+    ],
+  },
+  {
     id: "zec",
     symbol: "ZEC",
     name: "Zcash",
@@ -121,21 +136,6 @@ export const DEFAULT_ASSETS: Asset[] = [
     links: [
       { label: "TradingView", href: tv("NASDAQ:SPCX") },
       { label: "Yahoo", href: "https://finance.yahoo.com/quote/SPCX" },
-    ],
-  },
-  {
-    id: "spx",
-    symbol: "SPX",
-    name: "S&P 500",
-    kind: "index",
-    yahooSymbol: "^GSPC",
-    cnbcSymbol: ".SPX",
-    // SP:SPX is gated in the free embed widget.
-    tradingView: "FOREXCOM:SPXUSD",
-    links: [
-      { label: "TradingView", href: tv("FOREXCOM:SPXUSD") },
-      { label: "SPY", href: tv("AMEX:SPY") },
-      { label: "Yahoo", href: "https://finance.yahoo.com/quote/%5EGSPC" },
     ],
   },
 ];
