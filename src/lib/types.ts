@@ -75,4 +75,5 @@ export type DeskState = {
   focusId: string;
   customAssets: Asset[];
   hiddenIds: string[];
+  order: string[];
 };

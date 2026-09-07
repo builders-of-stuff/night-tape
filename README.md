@@ -1,6 +1,6 @@
 # Night Tape
 
-A local market desk for the names you already bounce between CoinMarketCap, DexScreener, and TradingView.
+A local market desk for the names you already bounce between CoinMarketCap, DexScreener, and TradingView. SvelteKit 5, runs entirely in the browser.
 
 ```bash
 pnpm install
@@ -49,6 +49,6 @@ Use the **add** search on the desk (`/` to focus). It hunts CoinGecko, DexScreen
 - Memes / mint addresses → DexScreener
 - Tickers (NVDA, SPY, `BRK-B`) → CNBC quotes + TradingView
 
-Hits land on the blotter and persist in `localStorage`. Drop a bay with **×** or **Drop from desk**. The starter names (BTC, ZEC, SOL, SUI, ETH, ZCAT, TSLA, SPCX, SPX) can be dropped and searched back.
+Hits land on the blotter and persist in `localStorage`. Drag bays to reorder. Drop a bay with **×** or **Drop from desk**. The starter names (BTC, ZEC, SOL, SUI, ETH, ZCAT, TSLA, SPCX, SPX) can be dropped and searched back.
 
 The starter list still lives in `src/lib/assets.ts` if you want to change the default book.

@@ -1,4 +1,4 @@
-import type { Asset, Quote, Tick } from "../lib/types";
+import type { Asset, Quote, Tick } from "./types";
 
 export type QuoteBatch = {
   quotes: Quote[];

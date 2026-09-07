@@ -1,5 +1,5 @@
-import { tv } from "../lib/assets";
-import type { Asset } from "../lib/types";
+import { tv } from "./assets";
+import type { Asset } from "./types";
 
 export type SearchGroup = "coin" | "dex" | "stock";
 

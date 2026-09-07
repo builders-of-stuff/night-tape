@@ -1,5 +1,5 @@
+import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 const yahooHeaders = {
@@ -9,7 +9,7 @@ const yahooHeaders = {
 };
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [tailwindcss(), sveltekit()],
   server: {
     port: 5173,
     proxy: {

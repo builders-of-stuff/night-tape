@@ -9,9 +9,11 @@ const empty = (): DeskState => ({
   focusId: DEFAULT_ASSETS[0]?.id ?? "btc",
   customAssets: [],
   hiddenIds: [],
+  order: [],
 });
 
 export function loadDesk(): DeskState {
+  if (typeof localStorage === "undefined") return empty();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return empty();
@@ -24,6 +26,7 @@ export function loadDesk(): DeskState {
       focusId: parsed.focusId ?? empty().focusId,
       customAssets: parsed.customAssets ?? [],
       hiddenIds: parsed.hiddenIds ?? [],
+      order: parsed.order ?? [],
     };
   } catch {
     return empty();

@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="%sveltekit.assets%/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
     <title>Night Tape</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,9 +12,9 @@
       href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600&family=Sora:wght@400;500;600&family=Syne:wght@700;800&display=swap"
       rel="stylesheet"
     />
+    %sveltekit.head%
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>

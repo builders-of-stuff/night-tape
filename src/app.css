@@ -29,24 +29,20 @@
 }
 
 html,
-body,
-#root {
+body {
   min-height: 100%;
 }
 
 body {
   margin: 0;
+  width: 100%;
+  min-height: 100svh;
   background: var(--color-ink);
   color: var(--color-paper);
   font-family: var(--font-sans);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-}
-
-#root {
-  width: 100%;
-  min-height: 100svh;
 }
 
 ::selection {
@@ -118,6 +114,15 @@ body {
   box-shadow:
     0 0 0 1px var(--color-lamp),
     0 0 28px rgba(255, 224, 138, 0.12);
+}
+
+.bay-dragging {
+  opacity: 0.42;
+}
+
+.bay-over {
+  border-color: var(--color-copper);
+  box-shadow: inset 0 2px 0 var(--color-copper);
 }
 
 ::-webkit-scrollbar {

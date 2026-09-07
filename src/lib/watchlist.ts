@@ -20,9 +20,27 @@ export function findOnDesk(asset: Asset, desk: Asset[]): Asset | undefined {
   return desk.find((row) => sameAsset(row, asset));
 }
 
-export function composeWatchlist(custom: Asset[], hiddenIds: string[]): Asset[] {
+export function composeWatchlist(
+  custom: Asset[],
+  hiddenIds: string[],
+  order: string[] = [],
+): Asset[] {
   const hidden = new Set(hiddenIds);
   const defaults = DEFAULT_ASSETS.filter((a) => !hidden.has(a.id));
   const extras = custom.filter((row) => !defaults.some((d) => sameAsset(d, row)));
-  return [...defaults, ...extras];
+  const list = [...defaults, ...extras];
+  if (!order.length) return list;
+  const byId = new Map(list.map((a) => [a.id, a]));
+  const seen = new Set<string>();
+  const sorted: Asset[] = [];
+  for (const id of order) {
+    const asset = byId.get(id);
+    if (!asset || seen.has(id)) continue;
+    sorted.push(asset);
+    seen.add(id);
+  }
+  for (const asset of list) {
+    if (!seen.has(asset.id)) sorted.push(asset);
+  }
+  return sorted;
 }
