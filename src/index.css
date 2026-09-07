@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Azeret Mono", ui-monospace, monospace;
+  --color-ink: #0a0c14;
+  --color-blotter: #12151f;
+  --color-panel: #181c28;
+  --color-rule: #2a3148;
+  --color-copper: #d08a4a;
+  --color-frost: #8ec8ff;
+  --color-lamp: #ffe08a;
+  --color-paper: #ede6d6;
+  --color-ghost: #8b93a7;
+  --color-stamp: #e25d7a;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100%;
+  min-height: 100svh;
+}
+
+::selection {
+  background: rgba(208, 138, 74, 0.35);
+  color: var(--color-paper);
+}
+
+:focus-visible {
+  outline: 1px solid var(--color-lamp);
+  outline-offset: 2px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.tape-rail {
+  background:
+    linear-gradient(180deg, rgba(255, 224, 138, 0.06), transparent 40%), #14110d;
+  box-shadow: inset 0 1px 0 rgba(255, 224, 138, 0.14);
+}
+
+.tape-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 48s linear infinite;
+}
+
+.tape-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.print-fresh {
+  color: var(--color-lamp);
+  text-shadow: 0 0 12px rgba(255, 224, 138, 0.45);
+  animation: cool 2.8s ease forwards;
+}
+
+@keyframes cool {
+  to {
+    color: var(--color-paper);
+    text-shadow: none;
+  }
+}
+
+.bay {
+  background: var(--color-blotter);
+  border: 1px solid var(--color-rule);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.bay:hover {
+  border-color: color-mix(in srgb, var(--color-copper) 55%, var(--color-rule));
+}
+
+.bay-live {
+  border-color: var(--color-lamp);
+  box-shadow:
+    0 0 0 1px var(--color-lamp),
+    0 0 28px rgba(255, 224, 138, 0.12);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-rule);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tape-track {
+    animation: none;
+  }
+  .print-fresh {
+    animation: none;
+    color: var(--color-lamp);
+  }
+}
