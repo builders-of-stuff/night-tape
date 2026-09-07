@@ -3,6 +3,7 @@ import { formatPct, formatPrice } from "./format";
 import { fetchAllQuotes } from "./quotes";
 import { appendQuoteTick, loadDesk, mergeTicks, saveDesk, uid } from "./storage";
 import type { AlertEvent, AlertKind, AlertRule, Asset, Quote, Tick } from "./types";
+import { playTripChime } from "./chime";
 import { composeWatchlist, findOnDesk, sameAsset } from "./watchlist";
 
 function evaluate(
@@ -125,6 +126,7 @@ class Desk {
     if (fired.length) {
       this.events = [...fired, ...this.events].slice(0, 80);
       fired.forEach(notifyBrowser);
+      playTripChime();
     }
     this.persist();
   }

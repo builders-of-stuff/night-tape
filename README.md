@@ -39,7 +39,7 @@ Paid upgrades only if you outgrow this: CMC Pro, Polygon / Twelve Data for stock
 
 ## Alerts
 
-Arm a tripwire on the focused name: price above, price below, or session move ≥ N%. Trips show as lamp toasts, in the trip log, and as desktop notifications if you click **Enable alerts**.
+Arm a tripwire on the focused name: price above, price below, or session move ≥ N%. Trips show as lamp toasts, in the trip log, a short desk-bell chime, and as desktop notifications if you click **Enable alerts**.
 
 ## Add a name
 

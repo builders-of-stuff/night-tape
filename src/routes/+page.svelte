@@ -5,6 +5,7 @@
   import TickerTape from "$lib/components/ticker-tape.svelte";
   import { desk } from "$lib/desk.svelte";
   import { POLL_MS } from "$lib/assets";
+  import { playTripChime, unlockChime } from "$lib/chime";
   import { formatClock, formatTime, usSession } from "$lib/format";
   import { onMount } from "svelte";
 
@@ -24,14 +25,19 @@
 
   onMount(() => {
     desk.start();
+    const unlock = () => unlockChime();
+    window.addEventListener("pointerdown", unlock, { once: true });
     const id = setInterval(() => (now = Date.now()), 1000);
     return () => {
       desk.stop();
+      window.removeEventListener("pointerdown", unlock);
       clearInterval(id);
     };
   });
 
   async function enableNotes() {
+    unlockChime();
+    playTripChime();
     if (typeof Notification === "undefined") return;
     notify = await Notification.requestPermission();
   }
