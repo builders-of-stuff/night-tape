@@ -130,9 +130,11 @@ export const DEFAULT_ASSETS: Asset[] = [
     kind: "index",
     yahooSymbol: "^GSPC",
     cnbcSymbol: ".SPX",
-    tradingView: "SP:SPX",
+    // SP:SPX is gated in the free embed widget.
+    tradingView: "FOREXCOM:SPXUSD",
     links: [
-      { label: "TradingView", href: tv("SP:SPX") },
+      { label: "TradingView", href: tv("FOREXCOM:SPXUSD") },
+      { label: "SPY", href: tv("AMEX:SPY") },
       { label: "Yahoo", href: "https://finance.yahoo.com/quote/%5EGSPC" },
     ],
   },

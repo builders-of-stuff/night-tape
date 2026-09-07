@@ -19,7 +19,7 @@ const CNBC_INDEX: Record<string, string> = {
 };
 
 const TV_INDEX: Record<string, string> = {
-  "^GSPC": "SP:SPX",
+  "^GSPC": "FOREXCOM:SPXUSD",
   "^DJI": "DJ:DJI",
   "^IXIC": "NASDAQ:IXIC",
   "^RUT": "CBOE:RUT",
